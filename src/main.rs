@@ -327,11 +327,11 @@ fn rmd160_transform(state: &mut [u32; 5], block: &[u8]) {
     (c, e) = r(c, d, e, a, b, f0, KK4, 11,  9, &x);
     (b, d) = r(b, c, d, e, a, f0, KK4, 11, 11, &x); /* #79 */
 
-    let t = state[1].wrapping_add(c).wrapping_add(dd);
-    state[1] = state[2].wrapping_add(d).wrapping_add(ee);
-    state[2] = state[3].wrapping_add(e).wrapping_add(aa);
-    state[3] = state[4].wrapping_add(a).wrapping_add(bb);
-    state[4] = state[0].wrapping_add(b).wrapping_add(cc);
+    let t = state[1].wrapping_add(cc).wrapping_add(d);
+    state[1] = state[2].wrapping_add(dd).wrapping_add(e);
+    state[2] = state[3].wrapping_add(ee).wrapping_add(a);
+    state[3] = state[4].wrapping_add(aa).wrapping_add(b);
+    state[4] = state[0].wrapping_add(bb).wrapping_add(c);
     state[0] = t;
 }
 
