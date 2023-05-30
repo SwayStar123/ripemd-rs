@@ -133,47 +133,101 @@ fn rmd160_transform(state: &mut [u32; 5], block: &[u8]) {
         x[i] = u32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
     }
 
-    // The order in which the words should be selected from the block array X for the left hand side are (each sub array within the 2D array represents a round. The array at the top represents the round at the top and the array at the bottom represents the round at the bottom):
-    let lhs = [
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], // R1
-        [7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8], // R2
-        [3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12], // R3
-        [1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2], // R4
-        [4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13], // R5
-    ];
-
-    // The order in which the words should be selected from the array X for the right hand side are (following the same pattern as above):
-    let rhs = [
-        [5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12], // R1
-        [6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2], // R2
-        [15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13], // R3
-        [8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14], // R4
-        [12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11], // R5
-    ];
-
-    // The order of the left rotates on the left hand side are:
-    let lhs_rotates = [
-        [11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8], // R1
-        [7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12], // R2
-        [11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5], // R3
-        [11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12], // R4
-        [9, 15, 5, 11, 6, 8, 13, 12, 5, 12, 13, 14, 11, 8, 5, 6], // R5
-    ];
-
-    // The order of the left rotates on the right hand side are:
-    let rhs_rotates = [
-        [8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6], // R1
-        [9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11], // R2
-        [9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5], // R3
-        [15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8], // R4
-        [8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11], // R5
-    ];
-
     let mut a = state[0];
     let mut b = state[1];
     let mut c = state[2];
     let mut d = state[3];
     let mut e = state[4];
+
+    /* Round 1 */
+    (a, c) = r(a, b, c, d, e, f0, K0, 11,  0, &x);
+    (e, b) = r(e, a, b, c, d, f0, K0, 14,  1, &x);
+    (d, a) = r(d, e, a, b, c, f0, K0, 15,  2, &x);
+    (c, e) = r(c, d, e, a, b, f0, K0, 12,  3, &x);
+    (b, d) = r(b, c, d, e, a, f0, K0,  5,  4, &x);
+    (a, c) = r(a, b, c, d, e, f0, K0,  8,  5, &x);
+    (e, b) = r(e, a, b, c, d, f0, K0,  7,  6, &x);
+    (d, a) = r(d, e, a, b, c, f0, K0,  9,  7, &x);
+    (c, e) = r(c, d, e, a, b, f0, K0, 11,  8, &x);
+    (b, d) = r(b, c, d, e, a, f0, K0, 13,  9, &x);
+    (a, c) = r(a, b, c, d, e, f0, K0, 14, 10, &x);
+    (e, b) = r(e, a, b, c, d, f0, K0, 15, 11, &x);
+    (d, a) = r(d, e, a, b, c, f0, K0,  6, 12, &x);
+    (c, e) = r(c, d, e, a, b, f0, K0,  7, 13, &x);
+    (b, d) = r(b, c, d, e, a, f0, K0,  9, 14, &x);
+    (a, c) = r(a, b, c, d, e, f0, K0,  8, 15, &x); /* #15 */
+
+    /* Round 2 */
+    (e, b) = r(e, a, b, c, d, f1, K1,  7,  7, &x);
+    (d, a) = r(d, e, a, b, c, f1, K1,  6,  4, &x);
+    (c, e) = r(c, d, e, a, b, f1, K1,  8, 13, &x);
+    (b, d) = r(b, c, d, e, a, f1, K1, 13,  1, &x);
+    (a, c) = r(a, b, c, d, e, f1, K1, 11, 10, &x);
+    (e, b) = r(e, a, b, c, d, f1, K1,  9,  6, &x);
+    (d, a) = r(d, e, a, b, c, f1, K1,  7, 15, &x);
+    (c, e) = r(c, d, e, a, b, f1, K1, 15,  3, &x);
+    (b, d) = r(b, c, d, e, a, f1, K1,  7, 12, &x);
+    (a, c) = r(a, b, c, d, e, f1, K1, 12,  0, &x);
+    (e, b) = r(e, a, b, c, d, f1, K1, 15,  9, &x);
+    (d, a) = r(d, e, a, b, c, f1, K1,  9,  5, &x);
+    (c, e) = r(c, d, e, a, b, f1, K1, 11,  2, &x);
+    (b, d) = r(b, c, d, e, a, f1, K1,  7, 14, &x);
+    (a, c) = r(a, b, c, d, e, f1, K1, 13, 11, &x);
+    (e, b) = r(e, a, b, c, d, f1, K1, 12,  8, &x); /* #31 */
+
+    /* Round 3 */
+    (d, a) = r(d, e, a, b, c, f2, K2, 11,  3, &x);
+    (c, e) = r(c, d, e, a, b, f2, K2, 13, 10, &x);
+    (b, d) = r(b, c, d, e, a, f2, K2,  6, 14, &x);
+    (a, c) = r(a, b, c, d, e, f2, K2,  7,  4, &x);
+    (e, b) = r(e, a, b, c, d, f2, K2, 14,  9, &x);
+    (d, a) = r(d, e, a, b, c, f2, K2,  9, 15, &x);
+    (c, e) = r(c, d, e, a, b, f2, K2, 13,  8, &x);
+    (b, d) = r(b, c, d, e, a, f2, K2, 15,  1, &x);
+    (a, c) = r(a, b, c, d, e, f2, K2, 14,  2, &x);
+    (e, b) = r(e, a, b, c, d, f2, K2,  8,  7, &x);
+    (d, a) = r(d, e, a, b, c, f2, K2, 13,  0, &x);
+    (c, e) = r(c, d, e, a, b, f2, K2,  6,  6, &x);
+    (b, d) = r(b, c, d, e, a, f2, K2,  5, 13, &x);
+    (a, c) = r(a, b, c, d, e, f2, K2, 12, 11, &x);
+    (e, b) = r(e, a, b, c, d, f2, K2,  7,  5, &x);
+    (d, a) = r(d, e, a, b, c, f2, K2,  5, 12, &x); /* #47 */
+
+    /* Round 4 */
+    (c, e) = r(c, d, e, a, b, f3, K3, 11,  1, &x);
+    (b, d) = r(b, c, d, e, a, f3, K3, 12,  9, &x);
+    (a, c) = r(a, b, c, d, e, f3, K3, 14, 11, &x);
+    (e, b) = r(e, a, b, c, d, f3, K3, 15, 10, &x);
+    (d, a) = r(d, e, a, b, c, f3, K3, 14,  0, &x);
+    (c, e) = r(c, d, e, a, b, f3, K3, 15,  8, &x);
+    (b, d) = r(b, c, d, e, a, f3, K3,  9, 12, &x);
+    (a, c) = r(a, b, c, d, e, f3, K3,  8,  4, &x);
+    (e, b) = r(e, a, b, c, d, f3, K3,  9, 13, &x);
+    (d, a) = r(d, e, a, b, c, f3, K3, 14,  3, &x);
+    (c, e) = r(c, d, e, a, b, f3, K3,  5,  7, &x);
+    (b, d) = r(b, c, d, e, a, f3, K3,  6, 15, &x);
+    (a, c) = r(a, b, c, d, e, f3, K3,  8, 14, &x);
+    (e, b) = r(e, a, b, c, d, f3, K3,  6,  5, &x);
+    (d, a) = r(d, e, a, b, c, f3, K3,  5,  6, &x);
+    (c, e) = r(c, d, e, a, b, f3, K3, 12,  2, &x); /* #63 */
+
+    /* Round 5 */
+    (b, d) = r(b, c, d, e, a, f4, K4,  9,  4, &x);
+    (a, c) = r(a, b, c, d, e, f4, K4, 15,  0, &x);
+    (e, b) = r(e, a, b, c, d, f4, K4,  5,  5, &x);
+    (d, a) = r(d, e, a, b, c, f4, K4, 11,  9, &x);
+    (c, e) = r(c, d, e, a, b, f4, K4,  6,  7, &x);
+    (b, d) = r(b, c, d, e, a, f4, K4,  8, 12, &x);
+    (a, c) = r(a, b, c, d, e, f4, K4, 13,  2, &x);
+    (e, b) = r(e, a, b, c, d, f4, K4, 12, 10, &x);
+    (d, a) = r(d, e, a, b, c, f4, K4,  5, 14, &x);
+    (c, e) = r(c, d, e, a, b, f4, K4, 12,  1, &x);
+    (b, d) = r(b, c, d, e, a, f4, K4, 13,  3, &x);
+    (a, c) = r(a, b, c, d, e, f4, K4, 14,  8, &x);
+    (e, b) = r(e, a, b, c, d, f4, K4, 11, 11, &x);
+    (d, a) = r(d, e, a, b, c, f4, K4,  8,  6, &x);
+    (c, e) = r(c, d, e, a, b, f4, K4,  5, 15, &x);
+    (b, d) = r(b, c, d, e, a, f4, K4,  6, 13, &x); /* #79 */
 
     let aa = a;
     let bb = b;
@@ -181,57 +235,97 @@ fn rmd160_transform(state: &mut [u32; 5], block: &[u8]) {
     let dd = d;
     let ee = e;
 
-    let functions = [f0, f1, f2, f3, f4];
-    let k = [K0, K1, K2, K3, K4];
-    let kk = [KK0, KK1, KK2, KK3, KK4];
-
-    // Left hand side
-    for i in 0..5 {
-        for j in 0..16 {
-            let (a1, c1) = r(
-                a,
-                b,
-                c,
-                d,
-                e,
-                functions[i],
-                k[i],
-                lhs_rotates[i][j],
-                lhs[i][j],
-                &x,
-            );
-            a = e;
-            e = d;
-            d = rol(10, c);
-            c = b;
-            b = a1;
-            (a, c) = (a1, c1);
-        }
-    }
-
-    // Right hand side
-    for i in 0..5 {
-        for j in 0..16 {
-            let (a1, c1) = r(
-                a,
-                b,
-                c,
-                d,
-                e,
-                functions[i],
-                kk[i],
-                rhs_rotates[i][j],
-                rhs[i][j],
-                &x,
-            );
-            a = e;
-            e = d;
-            d = rol(10, c);
-            c = b;
-            b = a1;
-            (a, c) = (a1, c1);
-        }
-    }
+    a = state[0];
+    b = state[1];
+    c = state[2];
+    d = state[3];
+    e = state[4];
+    
+    /* Parallel round 1 */
+    (a, c) = r(a, b, c, d, e, f4, KK0,  8,  5, &x);
+    (e, b) = r(e, a, b, c, d, f4, KK0,  9, 14, &x);
+    (d, a) = r(d, e, a, b, c, f4, KK0,  9,  7, &x);
+    (c, e) = r(c, d, e, a, b, f4, KK0, 11,  0, &x);
+    (b, d) = r(b, c, d, e, a, f4, KK0, 13,  9, &x);
+    (a, c) = r(a, b, c, d, e, f4, KK0, 15,  2, &x);
+    (e, b) = r(e, a, b, c, d, f4, KK0, 15, 11, &x);
+    (d, a) = r(d, e, a, b, c, f4, KK0,  5,  4, &x);
+    (c, e) = r(c, d, e, a, b, f4, KK0,  7, 13, &x);
+    (b, d) = r(b, c, d, e, a, f4, KK0,  7,  6, &x);
+    (a, c) = r(a, b, c, d, e, f4, KK0,  8, 15, &x);
+    (e, b) = r(e, a, b, c, d, f4, KK0, 11,  8, &x);
+    (d, a) = r(d, e, a, b, c, f4, KK0, 14,  1, &x);
+    (c, e) = r(c, d, e, a, b, f4, KK0, 14, 10, &x);
+    (b, d) = r(b, c, d, e, a, f4, KK0, 12,  3, &x);
+    (a, c) = r(a, b, c, d, e, f4, KK0,  6, 12, &x); /* #15 */
+    /* Parallel round 2 */
+    (e, b) = r(e, a, b, c, d, f3, KK1,  9,  6, &x);
+    (d, a) = r(d, e, a, b, c, f3, KK1, 13, 11, &x);
+    (c, e) = r(c, d, e, a, b, f3, KK1, 15,  3, &x);
+    (b, d) = r(b, c, d, e, a, f3, KK1,  7,  7, &x);
+    (a, c) = r(a, b, c, d, e, f3, KK1, 12,  0, &x);
+    (e, b) = r(e, a, b, c, d, f3, KK1,  8, 13, &x);
+    (d, a) = r(d, e, a, b, c, f3, KK1,  9,  5, &x);
+    (c, e) = r(c, d, e, a, b, f3, KK1, 11, 10, &x);
+    (b, d) = r(b, c, d, e, a, f3, KK1,  7, 14, &x);
+    (a, c) = r(a, b, c, d, e, f3, KK1,  7, 15, &x);
+    (e, b) = r(e, a, b, c, d, f3, KK1, 12,  8, &x);
+    (d, a) = r(d, e, a, b, c, f3, KK1,  7, 12, &x);
+    (c, e) = r(c, d, e, a, b, f3, KK1,  6,  4, &x);
+    (b, d) = r(b, c, d, e, a, f3, KK1, 15,  9, &x);
+    (a, c) = r(a, b, c, d, e, f3, KK1, 13,  1, &x);
+    (e, b) = r(e, a, b, c, d, f3, KK1, 11,  2, &x); /* #31 */
+    /* Parallel round 3 */
+    (d, a) = r(d, e, a, b, c, f2, KK2,  9, 15, &x);
+    (c, e) = r(c, d, e, a, b, f2, KK2,  7,  5, &x);
+    (b, d) = r(b, c, d, e, a, f2, KK2, 15,  1, &x);
+    (a, c) = r(a, b, c, d, e, f2, KK2, 11,  3, &x);
+    (e, b) = r(e, a, b, c, d, f2, KK2,  8,  7, &x);
+    (d, a) = r(d, e, a, b, c, f2, KK2,  6, 14, &x);
+    (c, e) = r(c, d, e, a, b, f2, KK2,  6,  6, &x);
+    (b, d) = r(b, c, d, e, a, f2, KK2, 14,  9, &x);
+    (a, c) = r(a, b, c, d, e, f2, KK2, 12, 11, &x);
+    (e, b) = r(e, a, b, c, d, f2, KK2, 13,  8, &x);
+    (d, a) = r(d, e, a, b, c, f2, KK2,  5, 12, &x);
+    (c, e) = r(c, d, e, a, b, f2, KK2, 14,  2, &x);
+    (b, d) = r(b, c, d, e, a, f2, KK2, 13, 10, &x);
+    (a, c) = r(a, b, c, d, e, f2, KK2, 13,  0, &x);
+    (e, b) = r(e, a, b, c, d, f2, KK2,  7,  4, &x);
+    (d, a) = r(d, e, a, b, c, f2, KK2,  5, 13, &x); /* #47 */
+    /* Parallel round 4 */
+    (c, e) = r(c, d, e, a, b, f1, KK3, 15,  8, &x);
+    (b, d) = r(b, c, d, e, a, f1, KK3,  5,  6, &x);
+    (a, c) = r(a, b, c, d, e, f1, KK3,  8,  4, &x);
+    (e, b) = r(e, a, b, c, d, f1, KK3, 11,  1, &x);
+    (d, a) = r(d, e, a, b, c, f1, KK3, 14,  3, &x);
+    (c, e) = r(c, d, e, a, b, f1, KK3, 14, 11, &x);
+    (b, d) = r(b, c, d, e, a, f1, KK3,  6, 15, &x);
+    (a, c) = r(a, b, c, d, e, f1, KK3, 14,  0, &x);
+    (e, b) = r(e, a, b, c, d, f1, KK3,  6,  5, &x);
+    (d, a) = r(d, e, a, b, c, f1, KK3,  9, 12, &x);
+    (c, e) = r(c, d, e, a, b, f1, KK3, 12,  2, &x);
+    (b, d) = r(b, c, d, e, a, f1, KK3,  9, 13, &x);
+    (a, c) = r(a, b, c, d, e, f1, KK3, 12,  9, &x);
+    (e, b) = r(e, a, b, c, d, f1, KK3,  5,  7, &x);
+    (d, a) = r(d, e, a, b, c, f1, KK3, 15, 10, &x);
+    (c, e) = r(c, d, e, a, b, f1, KK3,  8, 14, &x); /* #63 */
+    /* Parallel round 5 */
+    (b, d) = r(b, c, d, e, a, f0, KK4,  8, 12, &x);
+    (a, c) = r(a, b, c, d, e, f0, KK4,  5, 15, &x);
+    (e, b) = r(e, a, b, c, d, f0, KK4, 12, 10, &x);
+    (d, a) = r(d, e, a, b, c, f0, KK4,  9,  4, &x);
+    (c, e) = r(c, d, e, a, b, f0, KK4, 12,  1, &x);
+    (b, d) = r(b, c, d, e, a, f0, KK4,  5,  5, &x);
+    (a, c) = r(a, b, c, d, e, f0, KK4, 14,  8, &x);
+    (e, b) = r(e, a, b, c, d, f0, KK4,  6,  7, &x);
+    (d, a) = r(d, e, a, b, c, f0, KK4,  8,  6, &x);
+    (c, e) = r(c, d, e, a, b, f0, KK4, 13,  2, &x);
+    (b, d) = r(b, c, d, e, a, f0, KK4,  6, 13, &x);
+    (a, c) = r(a, b, c, d, e, f0, KK4,  5, 14, &x);
+    (e, b) = r(e, a, b, c, d, f0, KK4, 15,  0, &x);
+    (d, a) = r(d, e, a, b, c, f0, KK4, 13,  3, &x);
+    (c, e) = r(c, d, e, a, b, f0, KK4, 11,  9, &x);
+    (b, d) = r(b, c, d, e, a, f0, KK4, 11, 11, &x); /* #79 */
 
     let t = state[1].wrapping_add(c).wrapping_add(dd);
     state[1] = state[2].wrapping_add(d).wrapping_add(ee);
